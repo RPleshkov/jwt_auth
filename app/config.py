@@ -10,6 +10,7 @@ ENV_TEMPLATE_FILE = str(BASE_DIR / ".env.template")
 
 class DatabaseConfig(BaseModel):
     url: PostgresDsn
+    echo: bool
     naming_convention: dict = {
         "ix": "ix_%(column_0_label)s",
         "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -32,3 +33,6 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore
+
+
+print(settings.db.url)
