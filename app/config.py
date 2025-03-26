@@ -1,5 +1,5 @@
 from pathlib import Path
-from pydantic import BaseModel, PostgresDsn
+from pydantic import BaseModel, PostgresDsn, RedisDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,7 +22,23 @@ class DatabaseConfig(BaseModel):
     }
 
 
+class RedisConfig(BaseModel):
+    url: RedisDsn
+
+
+class EmailConfig(BaseSettings):
+    host: str
+    port: int
+    username: str
+    password: SecretStr
+
+
 class Settings(BaseSettings):
+    api_prefix: str = "/api/v1"
+
+    private_key: Path = BASE_DIR / "app" / "certs" / "jwt-private.pem"
+    public_key: Path = BASE_DIR / "app" / "certs" / "jwt-public.pem"
+
     model_config = SettingsConfigDict(
         env_file=[ENV_TEMPLATE_FILE, ENV_FILE],
         env_prefix="ENV_",
@@ -32,6 +48,9 @@ class Settings(BaseSettings):
     )
 
     db: DatabaseConfig
+    redis: RedisConfig
+    email: EmailConfig
+    frontend_url: str
 
 
 settings = Settings()  # type: ignore

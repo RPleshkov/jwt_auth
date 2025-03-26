@@ -26,4 +26,4 @@ class User(Base):
     password: Mapped[bytes] = mapped_column(BYTEA)
     role: Mapped[UserRole] = mapped_column(default=UserRole.user)
     is_active: Mapped[bool] = mapped_column(default=True)
-    email_verified: Mapped[bool] = mapped_column(default=False)
+    is_verified: Mapped[bool] = mapped_column(default=False)

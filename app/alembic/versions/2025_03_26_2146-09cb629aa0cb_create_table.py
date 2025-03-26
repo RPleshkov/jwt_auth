@@ -1,8 +1,8 @@
-"""delete username field in users table
+"""create table
 
-Revision ID: 1ae7f8fa6c93
+Revision ID: 09cb629aa0cb
 Revises:
-Create Date: 2025-03-26 19:35:03.340632
+Create Date: 2025-03-26 21:46:58.735366
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "1ae7f8fa6c93"
+revision: str = "09cb629aa0cb"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -32,7 +32,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("is_active", sa.Boolean(), nullable=False),
-        sa.Column("email_verified", sa.Boolean(), nullable=False),
+        sa.Column("is_verified", sa.Boolean(), nullable=False),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
