@@ -16,7 +16,7 @@ async def create_user(
     in_user: CreateUser,
 ):
     user = User(
-        username=in_user.username,
+        username=in_user.email,
         password=auth.hash_password(in_user.password),
     )
 
