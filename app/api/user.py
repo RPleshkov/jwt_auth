@@ -24,5 +24,5 @@ async def create_user(
             status_code=status.HTTP_409_CONFLICT, detail="such a user already exists"
         )
     confirmation_token = auth.serializer.dumps(in_user.email)
-    send_confirmation_email(to_email=in_user.email, token=confirmation_token)
+    send_confirmation_email.delay(to_email=in_user.email, token=confirmation_token)
     return {"message": "user created successfully"}
