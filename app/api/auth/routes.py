@@ -192,7 +192,7 @@ async def logout(
     return None
 
 
-@router.post("/register_confirm", status_code=status.HTTP_200_OK)
+@router.get("/register_confirm", status_code=status.HTTP_200_OK)
 async def confirm_registration(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)], token: str
 ) -> dict[str, str]:
