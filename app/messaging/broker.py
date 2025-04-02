@@ -1,14 +1,12 @@
+from aiosmtplib.errors import SMTPException
+from core.config import settings
+from core.mail import send_confirmation_email
+from core.redis_client import RedisHelper
 from faststream import FastStream, Logger
 from faststream.nats import JStream, NatsBroker, NatsMessage
 from nats.js.api import RetentionPolicy, StorageType
 from pydantic import BaseModel
-from aiosmtplib.errors import SMTPException
 from redis.exceptions import RedisError
-
-from core.redis_client import RedisHelper
-from core.config import settings
-from core.mail import send_confirmation_email
-
 
 broker = NatsBroker(str(settings.nats.url))
 app = FastStream(broker)

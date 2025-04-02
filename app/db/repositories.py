@@ -1,8 +1,8 @@
+from core.security import hash_password
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import User
-from core.security import hash_password
 
 
 async def create_user(session: AsyncSession, email: str, password: str) -> User:

@@ -1,21 +1,17 @@
 import logging
 from typing import Annotated
+
+from core.redis_client import RedisHelper
+from core.security import (ACCESS_TOKEN, PAYLOAD_KEY_SUB,
+                           PAYLOAD_KEY_TOKEN_TYPE, decode_jwt)
+from db import repositories
+from db.models.user import User
+from db.session import db_helper
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from utils.helpers import extract_jti
-from core.redis_client import RedisHelper
-from db import repositories
-from db.models.user import User
-from core.security import (
-    ACCESS_TOKEN,
-    PAYLOAD_KEY_SUB,
-    PAYLOAD_KEY_TOKEN_TYPE,
-    decode_jwt,
-)
-from db.session import db_helper
 
 logger = logging.getLogger(__name__)
 

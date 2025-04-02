@@ -1,11 +1,9 @@
 import uuid
 from enum import Enum
+
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import BYTEA, UUID
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-)
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
 

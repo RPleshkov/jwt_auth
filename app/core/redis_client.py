@@ -1,4 +1,5 @@
 from typing import Self
+
 import redis.asyncio as redis
 from redis.asyncio import Redis
 

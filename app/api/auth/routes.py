@@ -1,43 +1,27 @@
 import logging
-from typing import Annotated
 import uuid
+from typing import Annotated
 
-from fastapi import (
-    APIRouter,
-    Cookie,
-    Depends,
-    HTTPException,
-    Response,
-    status,
-)
-from fastapi.security import OAuth2PasswordRequestForm
-from itsdangerous import BadTimeSignature
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncSession
-from jwt.exceptions import InvalidTokenError
-from faststream.exceptions import FastStreamException
-
-from messaging.broker import pub_confirmation_email_to_broker
-from utils.helpers import extract_jti
 from core.redis_client import RedisHelper
-from .service import (
-    get_current_active_auth_user,
-    get_current_token_payload,
-)
-from .schemas import RegisterResponse, TokenInfo, UserCreate
+from core.security import (PAYLOAD_KEY_SUB, PAYLOAD_KEY_TOKEN_TYPE,
+                           REFRESH_TOKEN, create_access_token,
+                           create_refresh_token, decode_jwt, serializer,
+                           validate_password)
 from db import repositories
 from db.models import User
 from db.session import db_helper
-from core.security import (
-    create_access_token,
-    create_refresh_token,
-    validate_password,
-    decode_jwt,
-    PAYLOAD_KEY_TOKEN_TYPE,
-    REFRESH_TOKEN,
-    PAYLOAD_KEY_SUB,
-    serializer,
-)
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
+from fastapi.security import OAuth2PasswordRequestForm
+from faststream.exceptions import FastStreamException
+from itsdangerous import BadTimeSignature
+from jwt.exceptions import InvalidTokenError
+from messaging.broker import pub_confirmation_email_to_broker
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+from utils.helpers import extract_jti
+
+from .schemas import RegisterResponse, TokenInfo, UserCreate
+from .service import get_current_active_auth_user, get_current_token_payload
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["Auth"])

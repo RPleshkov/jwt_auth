@@ -1,18 +1,12 @@
 import uuid
-from datetime import (
-    datetime,
-    timedelta,
-    timezone,
-)
+from datetime import datetime, timedelta, timezone
 
-
-import jwt
 import bcrypt
+import jwt
+from db.models.user import User
 from itsdangerous import URLSafeTimedSerializer
 
-from db.models.user import User
 from .config import settings
-
 
 serializer = URLSafeTimedSerializer(
     secret_key=settings.security.private_key.read_text()

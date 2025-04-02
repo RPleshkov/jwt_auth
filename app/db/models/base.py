@@ -1,14 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, MetaData
-from sqlalchemy.sql import func
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    Mapped,
-    mapped_column,
-)
-
 from core.config import settings
+from sqlalchemy import DateTime, MetaData
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.sql import func
 
 
 class Base(DeclarativeBase):
