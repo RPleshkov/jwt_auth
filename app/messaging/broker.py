@@ -1,15 +1,12 @@
 from aiosmtplib.errors import SMTPException
 from core.config import settings
 from core.mail import send_confirmation_email
-from core.redis_client import RedisHelper
-from faststream import FastStream, Logger
-from faststream.nats import JStream, NatsBroker, NatsMessage
+from faststream.nats import JStream
+from faststream.nats.fastapi import Logger, NatsMessage, NatsRouter
 from nats.js.api import RetentionPolicy, StorageType
 from pydantic import BaseModel
-from redis.exceptions import RedisError
 
-broker = NatsBroker(str(settings.nats.url))
-app = FastStream(broker)
+router = NatsRouter(str(settings.nats.url))
 
 stream = JStream(
     name="mail_sending_queue",
@@ -17,46 +14,27 @@ stream = JStream(
     storage=StorageType.FILE,
     retention=RetentionPolicy.WORK_QUEUE,
     max_msg_size=10 * 1024 * 1024,
-    duplicate_window=2,
+    duplicate_window=10,
 )
 
 
 class EmailConfirm(BaseModel):
     to_email: str
     token: str
-    message_id: str
 
 
-@broker.subscriber("email.confirm", stream=stream)
+@router.subscriber(subject="email.confirm", stream=stream)
 async def handler(msg: EmailConfirm, raw_msg: NatsMessage, logger: Logger):
-    idempotency_key = f"email:{msg.message_id}"
+
     try:
-        async with RedisHelper() as redis:
-            if await redis.client.get(idempotency_key):  # type: ignore
-                logger.info(f"Duplicate message {msg.message_id}, skipping")
-                await raw_msg.ack()
-                return
-
-            logger.info(
-                f"Processing email to {msg.to_email} with message ID {msg.message_id}"
-            )
-            try:
-                await send_confirmation_email(msg.to_email, msg.token)
-                await redis.client.set(  # type: ignore
-                    idempotency_key, "done", ex=settings.nats.idempotency_key_expire
-                )
-                await raw_msg.ack()
-            except SMTPException as e:
-                logger.error(f"SMTP error: {e}")
-                await raw_msg.nack(delay=30)
-
-    except RedisError as e:
-        logger.error(f"Redis error: {e}")
+        await send_confirmation_email(msg.to_email, msg.token)
+        await raw_msg.ack()
+    except SMTPException as e:
+        logger.error(f"SMTP error: {e}")
         await raw_msg.nack(delay=30)
 
     except Exception as e:
-        logger.error(f"Unexpected error for message ID {msg.message_id}: {e}")
-        await raw_msg.nack(delay=30)
+        logger.error(f"Unexpected error: {e}")
 
 
 async def pub_confirmation_email_to_broker(
@@ -64,8 +42,8 @@ async def pub_confirmation_email_to_broker(
     token: str,
     message_id: str,
 ):
-    async with broker:
-        await broker.publish(
-            {"to_email": to_email, "token": token, "message_id": message_id},
-            subject="email.confirm",
-        )
+    await router.broker.publish(
+        message={"to_email": to_email, "token": token},
+        subject="email.confirm",
+        headers={"Nats-Msg-Id": message_id},
+    )
