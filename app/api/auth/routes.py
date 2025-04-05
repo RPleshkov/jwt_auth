@@ -3,10 +3,16 @@ import uuid
 from typing import Annotated
 
 from core.redis_client import RedisHelper
-from core.security import (PAYLOAD_KEY_SUB, PAYLOAD_KEY_TOKEN_TYPE,
-                           REFRESH_TOKEN, create_access_token,
-                           create_refresh_token, decode_jwt, serializer,
-                           validate_password)
+from core.security import (
+    PAYLOAD_KEY_SUB,
+    PAYLOAD_KEY_TOKEN_TYPE,
+    REFRESH_TOKEN,
+    create_access_token,
+    create_refresh_token,
+    decode_jwt,
+    serializer,
+    validate_password,
+)
 from db import repositories
 from db.models import User
 from db.session import db_helper
