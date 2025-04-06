@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 from core.config import settings
 from sqlalchemy import DateTime, MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column

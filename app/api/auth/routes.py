@@ -18,10 +18,8 @@ from db.models import User
 from db.session import db_helper
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
-from faststream.exceptions import FastStreamException
 from itsdangerous import BadTimeSignature
 from jwt.exceptions import InvalidTokenError
-from messaging.broker import pub_confirmation_email_to_broker
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils.helpers import extract_jti
@@ -47,11 +45,10 @@ async def create_user(
         logger.info(
             f"User registered successfully: ID={user.id}, Email={in_user.email}"
         )
-        confirmation_token = serializer.dumps(in_user.email)
+
         await repositories.save_confirmation_email_to_outbox(
             session=session,
             to_email=in_user.email,
-            token=confirmation_token,
             message_id=str(user.id),
         )
 

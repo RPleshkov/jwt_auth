@@ -27,12 +27,10 @@ async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
 async def save_confirmation_email_to_outbox(
     session: AsyncSession,
     to_email: str,
-    token: str,
     message_id: str,
 ) -> None:
     payload = {
         "to_email": to_email,
-        "token": token,
         "message_id": message_id,
     }
     message = Outbox(payload=payload)
