@@ -1,10 +1,11 @@
+import json
 from aiosmtplib.errors import SMTPException
 from core.config import settings
 from core.mail import send_confirmation_email
 from faststream.nats import JStream
 from faststream.nats.fastapi import Logger, NatsMessage, NatsRouter
 from nats.js.api import RetentionPolicy, StorageType
-from pydantic import BaseModel
+from pydantic import BaseModel, Json
 
 router = NatsRouter(str(settings.nats.url))
 
@@ -23,11 +24,14 @@ class EmailConfirm(BaseModel):
     token: str
 
 
-@router.subscriber(subject="email.confirm", stream=stream)
-async def handler(msg: EmailConfirm, raw_msg: NatsMessage, logger: Logger):
+@router.subscriber(subject="postgres.public.outbox")
+async def handler(msg: dict[str, dict], raw_msg: NatsMessage, logger: Logger):
+    data = json.loads(msg["payload"]["after"]["payload"])
 
+    to_email = data["to_email"]
+    token = data["token"]
     try:
-        await send_confirmation_email(msg.to_email, msg.token)
+        await send_confirmation_email(to_email, token)
         await raw_msg.ack()
     except SMTPException as e:
         logger.error(f"SMTP error: {e}")

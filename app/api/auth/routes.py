@@ -47,6 +47,14 @@ async def create_user(
         logger.info(
             f"User registered successfully: ID={user.id}, Email={in_user.email}"
         )
+        confirmation_token = serializer.dumps(in_user.email)
+        await repositories.save_confirmation_email_to_outbox(
+            session=session,
+            to_email=in_user.email,
+            token=confirmation_token,
+            message_id=str(user.id),
+        )
+
     except IntegrityError:
         logger.warning(f"Attempt to register with existing email: {in_user.email}")
         raise HTTPException(
@@ -58,18 +66,7 @@ async def create_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while creating the user.",
         )
-    confirmation_token = serializer.dumps(in_user.email)
-    message_id = str(uuid.uuid4())
-    try:
-        await pub_confirmation_email_to_broker(
-            to_email=in_user.email, token=confirmation_token, message_id=message_id
-        )
-    except FastStreamException as e:
-        logger.error(f"Failed to publish confirmation email to broker: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while sending the confirmation email.",
-        )
+
     return RegisterResponse(
         user_id=user.id,
         email=user.email,

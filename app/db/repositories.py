@@ -1,4 +1,7 @@
+from typing import Any
+
 from core.security import hash_password
+from db.models.outbox import Outbox
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +22,22 @@ async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
     stmt = select(User).where(User.email == email)
     user = await session.execute(stmt)
     return user.scalar_one_or_none()
+
+
+async def save_confirmation_email_to_outbox(
+    session: AsyncSession,
+    to_email: str,
+    token: str,
+    message_id: str,
+) -> None:
+    payload = {
+        "to_email": to_email,
+        "token": token,
+        "message_id": message_id,
+    }
+    message = Outbox(payload=payload)
+    session.add(message)
+    await session.commit()
 
 
 async def confirm_user(session: AsyncSession, email: str) -> None:
