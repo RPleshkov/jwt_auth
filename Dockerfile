@@ -5,13 +5,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /auth_practice
 
-RUN pip install --no-cache-dir poetry
-
+RUN pip install --upgrade pip wheel "poetry==2.1.1"
+RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock* ./
 
-RUN poetry config virtualenvs.in-project true && \
-    poetry install --no-root --no-interaction --no-ansi && \
-    rm -rf ~/.cache
+RUN poetry install
 
 COPY . .
 
