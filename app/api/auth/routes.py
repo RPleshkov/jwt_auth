@@ -18,7 +18,7 @@ from db.models import User
 from db.session import db_helper
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
-from itsdangerous import BadTimeSignature
+from itsdangerous import BadSignature
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -176,13 +176,13 @@ async def logout(
     return None
 
 
-@router.get("/register_confirm", status_code=status.HTTP_200_OK)
+@router.get("/register_confirm/", status_code=status.HTTP_200_OK)
 async def confirm_registration(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)], token: str
 ) -> dict[str, str]:
     try:
-        email = serializer.loads(token, max_age=3600)
-    except BadTimeSignature:
+        email = serializer.loads(token)
+    except BadSignature:
         raise HTTPException(status_code=400, detail="invalid token")
     try:
         await repositories.confirm_user(session, email)

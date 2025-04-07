@@ -5,7 +5,7 @@ from core.config import settings
 
 
 async def send_confirmation_email(to_email: str, token: str):
-    confirmation_url = f"{settings.frontend_url}/auth/register_confirm?token={token}"
+    confirmation_url = f"{settings.frontend_url}/auth/register_confirm/?token={token}"
     text = f"""Спасибо за регистрацию!  
 Для подтверждения регистрации перейдите по ссылке: {confirmation_url}  
 """

@@ -44,7 +44,6 @@ async def confirm_user(session: AsyncSession, email: str) -> None:
         .where(User.email == email)
         .values(
             is_verified=True,
-            is_active=True,
         )
     )
     await session.execute(stmt)
