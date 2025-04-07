@@ -20,6 +20,7 @@ class RedisHelper:
             port=port,
             db=db,
             max_connections=max_connections,
+            decode_responses=True,
         )
 
     async def __aenter__(self) -> Self:
