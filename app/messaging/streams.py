@@ -1,5 +1,9 @@
-from faststream.nats import DiscardPolicy, JStream, RetentionPolicy, StorageType
-
+from faststream.nats import (
+    DiscardPolicy,
+    JStream,
+    RetentionPolicy,
+    StorageType,
+)
 
 email_stream = JStream(
     name="email-stream",
